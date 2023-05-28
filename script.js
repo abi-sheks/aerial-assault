@@ -128,7 +128,7 @@ class Enemy {
     this.height = enemyHeight;
     this.speed = enemySpeed * (Math.random() * 3 + 1);
     this.x = CANVAS_WIDTH + Math.floor(Math.random() * 10 + 5);
-    this.y = Math.random() * CANVAS_HEIGHT + this.height;
+    this.y = Math.random() * (CANVAS_HEIGHT - this.height);
     this.rate = Math.random();
   }
   update() {
@@ -176,7 +176,7 @@ class EnemyManager {
   }
   checkDeath(col, player) {
     this.enemies.forEach((enemy) => {
-      if (col.checkCollision(enemy, player, 0.25)) {
+      if (col.checkCollision(enemy, player, 0.35)) {
         if (player.isInvincible) {
           enemy.die();
           score += scoreValue * Math.floor(Math.random() * 5 + 1);
@@ -374,6 +374,7 @@ let pickupManager = new PickupManager(timeout);
 // let scoreManager = new ScoreManager()
 const initializeGame = () => {
   bgm.load();
+  bgm.volume = 0.2;
   bgm.playbackRate = 1.25;
   bgm.play();
   player = new Player(playerImage, playerWidth, playerHeight, playerSpeed);
@@ -390,7 +391,7 @@ retryButton.addEventListener("click", () => {
   if (gameOver) {
     gameOverDOM.style.display = "none";
     gameDOM.style.display = "flex";
-    initializeGame()
+    initializeGame();
     // scoreManager = new ScoreManager()
     animate();
   }
@@ -408,6 +409,7 @@ function animate() {
   // bgm.play();
   if (bgm.ended) {
     bgm.load();
+    bgm.volume = 0.2;
     bgm.playbackRate = 1.25;
     bgm.play();
   }
@@ -443,7 +445,7 @@ startButtonDOM.addEventListener("click", () => {
   gameOverDOM.style.display = "none";
   startDOM.style.display = "none";
   gameDOM.style.display = "flex";
-  initializeGame()
+  initializeGame();
   gameOver = false;
   animate();
 });
