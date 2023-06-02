@@ -24,6 +24,7 @@ const enemyHeight = 9;
 const enemySpeed = 0.75;
 const enemyImage = document.getElementById("enemy-image");
 const enemyImageDeath = document.getElementById("enemy-image-death");
+let speedMultiplier = 0;
 //bullet constants
 const bulletWidth = 4;
 const bulletSpeed = 8;
@@ -35,6 +36,9 @@ const scoreDOM = document.getElementById("actual-score");
 //pickup constants
 const boltWidth = 10;
 const boltHeight = 10;
+const timerWidth = 10
+const timerHeight = 10
+const timerPickup = document.getElementById("timer-pickup")
 const pickupWidth = 6;
 const pickupHeight = 6;
 const invinciblePickup = document.getElementById("invincible");
@@ -152,18 +156,22 @@ class EnemyManager {
     this.enemies = [];
   }
   spawn() {
+    if(score % 1000 === 0)
+    { 
+      speedMultiplier += 0.02
+    }
     if (this.seed % this.rate === 0) {
       this.enemies = this.enemies.concat(
         Array.from(Array(5), () => {
           let randomno = Math.random();
-          if (randomno <= 0.5)
+          if (randomno <= 0.8)
             return new Enemy(enemyImage, enemyWidth, enemyHeight, enemySpeed);
           else
             return new IndestructibleEnemy(
               enemyImageDeath,
               enemyWidth,
               enemyHeight,
-              enemySpeed + 1
+              enemySpeed + speedMultiplier
             );
         })
       );
@@ -320,7 +328,7 @@ class PickupManager {
     this.currentPickups = [];
     this.duration = timeout;
   }
-  checkPickup(player, col) {
+  checkPickup(player, enemies, col) {
     this.currentPickups.forEach((pickup) => {
       if (col.checkCollision(player, pickup, 0.5)) {
         if (pickup.effect === "INVINCIBLE") {
@@ -336,6 +344,13 @@ class PickupManager {
         ) {
           player.speed += 2;
           setTimeout(() => (player.speed = playerSpeed), 3000);
+        }
+        else if(pickup.effect === "TIME_FREEZE")
+        {
+        enemies.forEach((enemy) => {
+          enemy.speed = 0;
+        })
+        setTimeout(() => enemies.forEach((enemy) => enemy.speed = enemySpeed), 3000);
         }
         this.currentPickups.splice(this.currentPickups.indexOf(pickup), 1);
       }
@@ -354,7 +369,7 @@ class PickupManager {
           "INVINCIBLE"
         )
       );
-    } else if (seed > 0.7 && seed < 1) {
+    } else if (seed > 0.3 && seed < 0.8) {
       this.currentPickups.push(
         new Pickup(
           parentX,
@@ -363,6 +378,17 @@ class PickupManager {
           boltHeight,
           speedPickup,
           "SPEED_UP"
+        )
+      );
+    } else if (seed > 0.8 && seed < 1) {
+      this.currentPickups.push(
+        new Pickup(
+          parentX,
+          parentY,
+          timerWidth,
+          timerHeight,
+          timerPickup,
+          "TIME_FREEZE"
         )
       );
     }
@@ -450,7 +476,7 @@ function animate() {
   bulletManager.spawn();
   bulletManager.despawn();
   bulletManager.checkHit(collisionManager, enemyManager.enemies, pickupManager);
-  pickupManager.checkPickup(player, collisionManager);
+  pickupManager.checkPickup(player, enemyManager.enemies, collisionManager);
   pickupManager.renderPickups();
   // scoreManager.checkPickup(player, collisionManager, bulletManager.scoreDrops)
   // scoreManager.showDrops(bulletManager.scoreDrops)
