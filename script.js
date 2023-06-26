@@ -158,7 +158,7 @@ class EnemyManager {
   spawn() {
     if(score % 1000 === 0)
     { 
-      speedMultiplier += 0.02
+      speedMultiplier += 0.001
     }
     if (this.seed % this.rate === 0) {
       this.enemies = this.enemies.concat(
@@ -197,7 +197,6 @@ class EnemyManager {
         if (player.isInvincible) {
           enemy.die();
           score += scoreValue * Math.floor(Math.random() * 5 + 1);
-          scoreDOM.innerHTML = score;
           this.enemies.splice(this.enemies.indexOf(enemy), 1);
         } else {
           playerDeathSound.play();
@@ -205,6 +204,7 @@ class EnemyManager {
           gameOver = true;
         }
       }
+      scoreDOM.innerHTML = score;
     });
   }
 }
@@ -418,6 +418,8 @@ let bulletManager = new BulletManager(player);
 let pickupManager = new PickupManager(timeout);
 // let scoreManager = new ScoreManager()
 const initializeGame = () => {
+  gameOver = false;
+  score = 0
   bgm.load();
   bgm.volume = 0.2;
   bgm.playbackRate = 1.25;
@@ -447,7 +449,6 @@ menuButtonDOM.addEventListener("click", () => {
   gameOverDOM.style.display = "none";
 });
 function animate() {
-  gameOver = false;
   // bgm.load();
   // bgm.volume = 0.3;
   // bgm.playbackRate = 1.25;
